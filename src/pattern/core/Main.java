@@ -41,7 +41,7 @@ public class Main {
             for (int j=0; j<main.kMers.size(); j++) {
                 if (j > genome.length())
                     break;
-                System.out.println("Genome : " + genome.toString() + ", kMers size " + main.kMers.size());
+//                System.out.println("Genome : " + genome.toString() + ", kMers size " + main.kMers.size());
                 for (String pattern : main.kMers.get(j)) {
 //                    System.out.println("Looking for : " + pattern);
                     if (genome.indexOf(pattern.toLowerCase()) > -1)
@@ -58,14 +58,18 @@ public class Main {
             for (int j=0; j<S.size(); j++) {
                 if (j == i)
                     continue;
+
+                // this is the UNION operation on all PS(j) where j not equal to i
                 sum.addAll(PS.get(j));
             }
+
+            // this is the set DIFFERENCE operation to remove all elements from previous UNION
             PS.get(i).removeAll(sum);
             sum.clear();
         }
 
         for (int i=0; i<S.size(); i++) {
-            System.out.print("Genome, S(" + i + ") - unique pattern(s) are { ");
+            System.out.print("Genome, S(" + i + ") : " + S.get(i).getName() + " - unique pattern(s) are { ");
             for (String unique : PS.get(i))
                 System.out.print(unique + " ");
             System.out.println("}");
