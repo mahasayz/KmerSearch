@@ -20,14 +20,14 @@ public class Main {
         for (int k=1; k<4; k++) {
             Combine.printAllKLength(nucleotides, k, temp);
             kMers.add(new ArrayList<String>(temp));
-            System.out.println("k = " + k + ", size = " + temp.size());
+//            System.out.println("k = " + k + ", size = " + temp.size());
             temp.clear();
         }
     }
 
     public static void main(String[] args) {
         Main main = new Main();
-        String[] genomes = {"ataaaa", "atcgta", "atagcg"};
+        String[] genomes = {"ataaaa", "atcgta", "atagcg", "cgtaag", "tagcgt"};
 
         List<Genome> S = new ArrayList<Genome>();
         for (String genome : genomes)
@@ -77,8 +77,8 @@ public class Main {
 
         Map<Integer, HashSet<String>> biomarkerCandidates = new HashMap<Integer, HashSet<String>>();
         for (int i=0; i<S.size(); i++) {
-            System.out.print("Genome, S(" + i + ") : " + S.get(i).getName() + " - unique pattern(s) are { ");
-            for (String unique : finalPS.get(i)) {
+            System.out.print("Genome, S(" + i + ") : " + S.get(i).getName() + " - pattern(s) are { ");
+            for (String unique : PS.get(i)) {
                 System.out.print(unique + " ");
                 if (biomarkerCandidates.get(unique.length()) == null)
                     temp.clear();
@@ -94,37 +94,32 @@ public class Main {
         ArrayList<String> biomarkers = new ArrayList<String>();
         boolean complete = false;
         int candidatesRequired = (int) Math.ceil(Math.log(genomes.length) / Math.log(2));
-        for (Integer val : biomarkerCandidates.keySet()) {
-            temp = biomarkerCandidates.get(val);
-            if (temp.size() < candidatesRequired)
-                continue;
-            for (String str : temp)
-                if (biomarkers.size() < candidatesRequired)
-                    biomarkers.add(str);
-                else {
-                    complete = true;
-                    break;
-                }
-            if (complete)
-                break;
-        }
 
-        System.out.println("number for biomarkers, m = " + biomarkers.size());
-        System.out.println("Unique binary values for genomes are : ");
         StringBuilder sb = new StringBuilder();
-        for (String gen : genomes) {
-            System.out.print("Genome : " + gen + " ");
-            for (String pattern : biomarkers)
-                if (gen.indexOf(pattern.toLowerCase()) > -1) {
-                    System.out.print("(" + pattern + ") 1 ");
-                    sb.append("1");
+        HashSet<Integer> uniqueDecimals = new HashSet<Integer>();
+
+        for (Integer i : biomarkerCandidates.keySet()) {
+            if (biomarkerCandidates.get(i).size() < candidatesRequired)
+                continue;
+            for (String gen : genomes) {
+                System.out.print("Genome : " + gen + " ");
+                for (String pattern : biomarkerCandidates.get(i)) {
+                    if (gen.indexOf(pattern.toLowerCase()) > -1) {
+                        System.out.print("(" + pattern + ") 1 ");
+                        sb.append("1");
+                    } else {
+                        System.out.print("(" + pattern + ") 0 ");
+                        sb.append("0");
+                    }
                 }
-                else {
-                    System.out.print("(" + pattern + ") 0 ");
-                    sb.append("0");
-                }
-            System.out.print("Decimal Value = " + Integer.parseInt(sb.toString(), 2) + "\n");
-            sb.setLength(0);
+                System.out.print("Decimal Value = " + Integer.parseInt(sb.toString(), 2) + "\n");
+                uniqueDecimals.add(Integer.parseInt(sb.toString(), 2));
+                sb.setLength(0);
+            }
+            if (uniqueDecimals.size() == genomes.length) {
+                System.out.println("Biomarkers are { " + String.join(", ", biomarkerCandidates.get(i)) + " }");
+                break;
+            }
         }
 
     }
